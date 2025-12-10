@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  # Servidor de Mensajería (Broker)
+  activemq:
+    image: apache/activemq-classic:latest
+    container_name: search-activemq
+    ports:
+      - "61616:61616" # Puerto JMS (para Java)
+      - "8161:8161"   # Consola Web (para ti)
+    environment:
+      ACTIVEMQ_ADMIN_LOGIN: admin
+      ACTIVEMQ_ADMIN_PASSWORD: admin
+    networks:
+      - search-network
+
+networks:
+  search-network:
+    driver: bridge

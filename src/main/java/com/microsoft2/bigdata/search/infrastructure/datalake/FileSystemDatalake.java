@@ -1,4 +1,4 @@
-package com.microsoft2.bigdata.search.infrastructure.persistence;
+package com.microsoft2.bigdata.search.infrastructure.datalake;
 
 import com.microsoft2.bigdata.search.domain.model.Document;
 import com.microsoft2.bigdata.search.domain.ports.DatalakeRepository;
