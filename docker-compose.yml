@@ -1,19 +1,85 @@
-version: '3.8'
-
 services:
-  # Servidor de Mensajería (Broker)
+  # 1. Message Broker
   activemq:
     image: apache/activemq-classic:latest
-    container_name: search-activemq
+    container_name: broker
     ports:
-      - "61616:61616" # Puerto JMS (para Java)
-      - "8161:8161"   # Consola Web (para ti)
-    environment:
-      ACTIVEMQ_ADMIN_LOGIN: admin
-      ACTIVEMQ_ADMIN_PASSWORD: admin
+      - "8161:8161"   # Consola Web
+      - "61616:61616" # Puerto JMS
     networks:
-      - search-network
+      - search-net
 
+  # 2. Crawler (Ingesta)
+  crawler:
+    build: .
+    container_name: crawler
+    depends_on:
+      - activemq
+    environment:
+      - BROKER_URL=tcp://activemq:61616
+      - BOOK_START=1660
+      - BOOK_END=1670    
+    # Ejecutamos la clase CrawlerNode
+    command: com.microsoft2.bigdata.search.apps.CrawlerNode
+    volumes:
+      - datalake_volume:/app/data # Compartimos disco para ver los archivos
+    networks:
+      - search-net
+
+  # 3. Indexer (Procesamiento)
+  indexer:
+    build: .
+    container_name: indexer
+    depends_on:
+      - activemq
+    environment:
+      - BROKER_URL=tcp://activemq:61616
+    # Ejecutamos la clase IndexerNode
+    command: com.microsoft2.bigdata.search.apps.IndexerNode
+    volumes:
+      - datalake_volume:/app/data
+    networks:
+      - search-net
+
+  # 4. Search Node 1
+  search-node-1:
+    build: .
+    container_name: search-1
+    environment:
+      - PORT=8080
+    # Ejecutamos la clase SearchNode
+    command: com.microsoft2.bigdata.search.apps.SearchNode
+    networks:
+      - search-net
+
+  # 5. Search Node 2 (¡Escalado!)
+  search-node-2:
+    build: .
+    container_name: search-2
+    environment:
+      - PORT=8080
+    command: com.microsoft2.bigdata.search.apps.SearchNode
+    networks:
+      - search-net
+
+  # 6. Load Balancer (Entrada al sistema)
+  nginx:
+    image: nginx:latest
+    container_name: load-balancer
+    ports:
+      - "80:80" # Exponemos el puerto 80 de tu PC
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - search-node-1
+      - search-node-2
+    networks:
+      - search-net
+
+# Definimos una red compartida y un volumen para los datos
 networks:
-  search-network:
+  search-net:
     driver: bridge
+
+volumes:
+  datalake_volume:
