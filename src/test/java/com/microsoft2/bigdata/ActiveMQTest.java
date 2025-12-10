@@ -9,10 +9,9 @@ import com.microsoft2.bigdata.search.infrastructure.messaging.ActiveMQEventBus; 
 import com.microsoft2.bigdata.search.infrastructure.persistence.*;
 import com.microsoft2.bigdata.search.infrastructure.datalake.*;
 
-
 import java.util.Set;
 
-public class GutendexTest {
+public class ActiveMQTest {
     public static void main(String[] args) {
         System.out.println("--- BUSCADOR DISTRIBUIDO (CON ACTIVEMQ) ---");
 
