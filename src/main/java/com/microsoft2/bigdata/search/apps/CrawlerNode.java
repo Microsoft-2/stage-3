@@ -10,7 +10,7 @@ import com.microsoft2.bigdata.search.infrastructure.messaging.ActiveMQEventBus;
 
 public class CrawlerNode {
     public static void main(String[] args) {
-        System.out.println("🕷️ INICIANDO CRAWLER MASIVO...");
+        System.out.println("🕷️ INICIANDO CRAWLER...");
 
         String brokerUrl = System.getenv().getOrDefault("BROKER_URL", "tcp://localhost:61616");
         String datalakePath = System.getenv().getOrDefault("DATALAKE_PATH", "datalake_store");
@@ -31,9 +31,7 @@ public class CrawlerNode {
             try {
                 System.out.println("🕷️ Procesando libro ID: " + bookId);
                 crawler.ingestContent(bookId);
-                
-                // Pausa pequeña para no ser baneados por Gutendex (Rate Limiting)
-                Thread.sleep(2000); 
+                Thread.sleep(5000); 
             } catch (Exception e) {
                 System.err.println("⚠️ Error procesando libro " + bookId + ": " + e.getMessage());
             }

@@ -1,14 +1,14 @@
 package com.microsoft2.bigdata.search.infrastructure.api;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.microsoft2.bigdata.search.domain.ports.BookProvider;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.microsoft2.bigdata.search.domain.ports.BookProvider;
 
 public class GutendexAdapter implements BookProvider {
     private static final String API_URL = "https://gutendex.com/books/?ids=";
@@ -62,42 +62,42 @@ public class GutendexAdapter implements BookProvider {
     }
 
     private String fetch(String url) throws Exception {
-        int maxRedirects = 5;
-        
-        for (int i = 0; i < maxRedirects; i++) {
+        int maxRetries = 5;
+        int waitTime = 10000; // Empezamos esperando 10 segundos si falla
+
+        for (int i = 0; i < maxRetries; i++) {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .GET()
-                    // Identificarnos evita errores 403 en algunos servidores
-                    .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Java/25") 
+                    .header("User-Agent", "Mozilla/5.0 (Education Project; ULPGC)") // Sé amable identificándote
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            
             int status = response.statusCode();
 
             if (status == 200) {
                 return response.body();
-            } else if (status >= 300 && status < 400) {
-                // Manejar redirección (301, 302, 307)
+            } 
+            else if (status == 429) {
+                // ERROR 429: BLOQUEO TEMPORAL POR EXCESO DE PETICIONES
+                System.err.println("⛔ Rate Limit (429) detectado. Esperando " + (waitTime/1000) + "s antes de reintentar...");
+                Thread.sleep(waitTime);
+                waitTime *= 2; // Exponential Backoff: Esperamos el doble la próxima vez (10s, 20s, 40s...)
+                continue; // Volvemos a intentar la misma petición
+            }
+            else if (status >= 300 && status < 400) {
+                // Manejo de Redirecciones (Como ya tenías)
                 String newUrl = response.headers().firstValue("Location").orElse(null);
+                if (newUrl == null) throw new RuntimeException("Redirección sin cabecera Location");
+                if (!newUrl.startsWith("http")) newUrl = URI.create(url).resolve(newUrl).toString();
                 
-                if (newUrl == null) {
-                    throw new RuntimeException("Redirección detectada sin cabecera Location");
-                }
-                
-                // Si la redirección es relativa, resolverla contra la URL original
-                if (!newUrl.startsWith("http")) {
-                    newUrl = URI.create(url).resolve(newUrl).toString();
-                }
-
-                System.out.println("🔄 Redirigiendo (HTTP " + status + ") a: " + newUrl);
-                url = newUrl; // Actualizamos la URL y continuamos el bucle
-            } else {
+                System.out.println("🔄 Redirigiendo a: " + newUrl);
+                url = newUrl; 
+            } 
+            else {
                 throw new RuntimeException("Error HTTP " + status + " al acceder a " + url);
             }
         }
-        
-        throw new RuntimeException("Se excedió el límite de redirecciones intentando descargar el libro.");
+        throw new RuntimeException("Se excedió el límite de reintentos para: " + url);
     }
 }
