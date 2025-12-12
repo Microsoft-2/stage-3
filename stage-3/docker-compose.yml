@@ -32,7 +32,7 @@ services:
     environment:
       - BROKER_URL=tcp://activemq:61616
       - BOOK_START=1000
-      - BOOK_END=1050
+      - BOOK_END=2000
     volumes:
       - datalake_shared:/app/data
     networks:
@@ -44,8 +44,8 @@ services:
     restart: on-failure
     environment:
       - BROKER_URL=tcp://activemq:61616
-      - BOOK_START=1050
-      - BOOK_END=1100
+      - BOOK_START=2000
+      - BOOK_END=3000
     volumes:
       - datalake_shared:/app/data
     networks:
@@ -57,8 +57,8 @@ services:
     restart: on-failure
     environment:
       - BROKER_URL=tcp://activemq:61616
-      - BOOK_START=1100
-      - BOOK_END=1150
+      - BOOK_START=3000
+      - BOOK_END=4000
     volumes:
       - datalake_shared:/app/data
     networks:
@@ -70,8 +70,8 @@ services:
     restart: on-failure
     environment:
       - BROKER_URL=tcp://activemq:61616
-      - BOOK_START=1150
-      - BOOK_END=1200
+      - BOOK_START=4000
+      - BOOK_END=5000
     volumes:
       - datalake_shared:/app/data
     networks:
@@ -83,8 +83,8 @@ services:
     restart: on-failure
     environment:
       - BROKER_URL=tcp://activemq:61616
-      - BOOK_START=1200
-      - BOOK_END=1250
+      - BOOK_START=5000
+      - BOOK_END=6000
     volumes:
       - datalake_shared:/app/data
     networks:
@@ -96,8 +96,8 @@ services:
     restart: on-failure
     environment:
       - BROKER_URL=tcp://activemq:61616
-      - BOOK_START=1250
-      - BOOK_END=1300
+      - BOOK_START=6000
+      - BOOK_END=7000
     volumes:
       - datalake_shared:/app/data
     networks:
@@ -155,7 +155,6 @@ services:
       - activemq
     networks:
       - search-net
-
 
   indexer-5:
     build: .

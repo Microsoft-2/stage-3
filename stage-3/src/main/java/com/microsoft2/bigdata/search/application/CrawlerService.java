@@ -4,6 +4,8 @@ import com.microsoft2.bigdata.search.domain.model.Document;
 import com.microsoft2.bigdata.search.domain.ports.DatalakeRepository;
 import com.microsoft2.bigdata.search.domain.ports.BookProvider;
 import com.microsoft2.bigdata.search.domain.ports.EventBus;
+import com.google.gson.Gson;
+import java.util.Map;
 
 public class CrawlerService {
     private final DatalakeRepository datalake;
@@ -30,10 +32,15 @@ public class CrawlerService {
         // 3. Guardar al datalake
         datalake.save(document);
 
+        String jsonEvent = new Gson().toJson(Map.of(
+            "id", document.getId(),
+            "content", document.getContent()
+        ));
+
         System.out.println("Document " + bookId + " downloaded and saved.");
 
         // Nombre del topic: document.downloaded
-        eventBus.publish("document.downloaded", bookId);
+        eventBus.publish("document.downloaded", jsonEvent);
     }
 
 }
