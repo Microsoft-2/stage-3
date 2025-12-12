@@ -24,13 +24,13 @@ public class GutendexAdapter implements BookProvider {
     @Override
     public String getBookText(String bookId) {
         try {
-            System.out.println("Consultando metadatos para libro ID: " + bookId);
+            System.out.println("Consulting metadata for book ID: " + bookId);
             String jsonResponse = fetch(API_URL + bookId);
             
             JsonObject json = JsonParser.parseString(jsonResponse).getAsJsonObject();
             
             if (!json.has("count") || json.get("count").getAsInt() == 0) {
-                System.err.println("❌ Libro no encontrado en Gutendex API: " + bookId);
+                System.err.println("Book not found in Gutendex API: " + bookId);
                 return null;
             }
 
@@ -41,21 +41,21 @@ public class GutendexAdapter implements BookProvider {
             for (String key : formats.keySet()) {
                 if (key.startsWith("text/plain")) {
                     textUrl = formats.get(key).getAsString();
-                    System.out.println("✅ Formato encontrado (" + key + "): " + textUrl);
+                    System.out.println("Format found (" + key + "): " + textUrl);
                     break;
                 }
             }
 
             if (textUrl == null) {
-                System.err.println("❌ El libro existe pero no tiene formato text/plain disponible.");
+                System.err.println("The book exists but does not have a text/plain format available.");
                 return null;
             }
 
-            System.out.println("⬇️ Descargando contenido del libro...");
+            System.out.println("⬇Downloading book content...");
             return fetch(textUrl);
 
         } catch (Exception e) {
-            System.err.println("❌ Error en GutendexAdapter: " + e.getMessage());
+            System.err.println("Error in GutendexAdapter: " + e.getMessage());
             e.printStackTrace();
             return null;
         }
@@ -80,7 +80,7 @@ public class GutendexAdapter implements BookProvider {
             } 
             else if (status == 429) {
                 // ERROR 429: BLOQUEO TEMPORAL POR EXCESO DE PETICIONES
-                System.err.println("⛔ Rate Limit (429) detectado. Esperando " + (waitTime/1000) + "s antes de reintentar...");
+                System.err.println("Rate Limit (429) detected. Waiting " + (waitTime/1000) + "s before retrying...");
                 Thread.sleep(waitTime);
                 waitTime *= 2; // Exponential Backoff: Esperamos el doble la próxima vez (10s, 20s, 40s...)
                 continue; // Volvemos a intentar la misma petición
@@ -88,16 +88,16 @@ public class GutendexAdapter implements BookProvider {
             else if (status >= 300 && status < 400) {
                 // Manejo de Redirecciones (Como ya tenías)
                 String newUrl = response.headers().firstValue("Location").orElse(null);
-                if (newUrl == null) throw new RuntimeException("Redirección sin cabecera Location");
+                if (newUrl == null) throw new RuntimeException("Redirection without Location header");
                 if (!newUrl.startsWith("http")) newUrl = URI.create(url).resolve(newUrl).toString();
                 
-                System.out.println("🔄 Redirigiendo a: " + newUrl);
+                System.out.println("Redirecting to: " + newUrl);
                 url = newUrl; 
             } 
             else {
-                throw new RuntimeException("Error HTTP " + status + " al acceder a " + url);
+                throw new RuntimeException("Error HTTP " + status + " when accessing " + url);
             }
         }
-        throw new RuntimeException("Se excedió el límite de reintentos para: " + url);
+        throw new RuntimeException("Exceeded retry limit for: " + url);
     }
 }

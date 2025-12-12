@@ -20,7 +20,7 @@ public class IndexerService {
         Document doc = datalake.load(documentId);
 
         if (doc == null){
-            System.err.println("Indexer: Error, documento no encontrado: " + documentId);
+            System.err.println("Indexer: Error, document not find: " + documentId);
             return;
         }
 
@@ -32,6 +32,6 @@ public class IndexerService {
             indexRepository.save(word, doc.getId());
         }
 
-        System.out.println("Indexer: Documento " + documentId + " indexado (" + tokens.size() + "palabras).");
+        System.out.println("Indexer: Document " + documentId + " indexed (" + tokens.size() + " words).");
     }
 }

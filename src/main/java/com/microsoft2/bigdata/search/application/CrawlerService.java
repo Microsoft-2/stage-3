@@ -30,7 +30,7 @@ public class CrawlerService {
         // 3. Guardar al datalake
         datalake.save(document);
 
-        System.out.println("Documento " + bookId + " descargado y guardado.");
+        System.out.println("Document " + bookId + " downloaded and saved.");
 
         // Nombre del topic: document.downloaded
         eventBus.publish("document.downloaded", bookId);

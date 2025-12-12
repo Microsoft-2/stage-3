@@ -13,7 +13,7 @@ import static spark.Spark.port;
 
 public class SearchNode {
     public static void main(String[] args) {
-        System.out.println("🔍 INICIANDO SEARCH NODE (API REST)...");
+        System.out.println("STARTING SEARCH NODE (API REST)...");
 
         // Configuración de Puerto (Docker nos pasará el puerto por variable de entorno)
         // Si no, usa el 8080 por defecto
@@ -37,10 +37,10 @@ public class SearchNode {
                 return "Falta el parámetro 'q'";
             }
 
-            System.out.println("🔍 Búsqueda recibida: " + query);
+            System.out.println("Search query received: " + query);
             return searchService.search(query); // Devuelve JSON automáticamente (Set.toString())
         });
 
-        System.out.println("🔍 Servidor Web listo en puerto " + port());
+        System.out.println("Server Web ready on port " + port());
     }
 }

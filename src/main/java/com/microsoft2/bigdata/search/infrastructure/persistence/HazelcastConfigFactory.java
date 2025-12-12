@@ -16,7 +16,7 @@ public class HazelcastConfigFactory {
         String clusterMembers = System.getenv("CLUSTER_MEMBERS");
         
         if (clusterMembers != null && !clusterMembers.isEmpty()) {
-            System.out.println("🌍 Configurando Hazelcast TCP/IP con miembros: " + clusterMembers);
+            System.out.println("Configuring Hazelcast TCP/IP with members: " + clusterMembers);
             
             // Accedemos a la configuración de red
             JoinConfig join = config.getNetworkConfig().getJoin();
@@ -32,7 +32,7 @@ public class HazelcastConfigFactory {
                 join.getTcpIpConfig().addMember(ip.trim());
             }
         } else {
-            System.out.println("⚠️ Variable CLUSTER_MEMBERS vacía. Usando Multicast por defecto (solo local).");
+            System.out.println("Variable CLUSTER_MEMBERS empty. Using Multicast by default (only local).");
         }
         
         return config;

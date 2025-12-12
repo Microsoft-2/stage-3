@@ -1,0 +1,12 @@
+target/
+
+datalake/
+datalake_shared/
+control/
+
+.vscode/
+.idea/
+*.iml
+
+.DS_Store
+Thumbs.db

@@ -17,7 +17,7 @@ public class ActiveMQEventBus implements EventBus {
             // false = sin transacciones, AUTO_ACKNOWLEDGE = confirmación automática
             this.session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         } catch (JMSException e) {
-            throw new RuntimeException("Error conectando a ActiveMQ", e);
+            throw new RuntimeException("Error conecting to ActiveMQ", e);
         }
     }
 
@@ -28,9 +28,9 @@ public class ActiveMQEventBus implements EventBus {
             MessageProducer producer = session.createProducer(destination);
             TextMessage message = session.createTextMessage(messageContent);
             producer.send(message);
-            System.out.println("📨 EventBus: Publicado en '" + topicName + "': " + messageContent);
+            System.out.println("EventBus: Published in '" + topicName + "': " + messageContent);
         } catch (JMSException e) {
-            throw new RuntimeException("Error publicando mensaje", e);
+            throw new RuntimeException("Error publishing message", e);
         }
     }
 
@@ -45,7 +45,7 @@ public class ActiveMQEventBus implements EventBus {
                 try {
                     if (message instanceof TextMessage textMessage) {
                         String text = textMessage.getText();
-                        System.out.println("📩 EventBus: Recibido en '" + topicName + "': " + text);
+                        System.out.println("EventBus: Received in '" + topicName + "': " + text);
                         consumer.consume(text);
                     }
                 } catch (JMSException e) {
@@ -53,7 +53,7 @@ public class ActiveMQEventBus implements EventBus {
                 }
             });
         } catch (JMSException e) {
-            throw new RuntimeException("Error suscribiendo", e);
+            throw new RuntimeException("Error subscribing", e);
         }
     }
 }

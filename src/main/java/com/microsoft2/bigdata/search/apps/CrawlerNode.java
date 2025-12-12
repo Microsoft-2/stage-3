@@ -10,7 +10,7 @@ import com.microsoft2.bigdata.search.infrastructure.messaging.ActiveMQEventBus;
 
 public class CrawlerNode {
     public static void main(String[] args) {
-        System.out.println("🕷️ INICIANDO CRAWLER...");
+        System.out.println("STARTING CRAWLER...");
 
         String brokerUrl = System.getenv().getOrDefault("BROKER_URL", "tcp://localhost:61616");
         String datalakePath = System.getenv().getOrDefault("DATALAKE_PATH", "datalake_store");
@@ -24,19 +24,19 @@ public class CrawlerNode {
         EventBus eventBus = new ActiveMQEventBus(brokerUrl);
         CrawlerService crawler = new CrawlerService(datalake, provider, eventBus);
 
-        System.out.println("📚 Rango asignado: IDs " + startId + " al " + endId);
+        System.out.println("Range assigned: IDs " + startId + " to " + endId);
 
         for (int i = startId; i <= endId; i++) {
             String bookId = String.valueOf(i);
             try {
-                System.out.println("🕷️ Procesando libro ID: " + bookId);
+                System.out.println("Processing book ID: " + bookId);
                 crawler.ingestContent(bookId);
                 Thread.sleep(5000); 
             } catch (Exception e) {
-                System.err.println("⚠️ Error procesando libro " + bookId + ": " + e.getMessage());
+                System.err.println("Error processing book " + bookId + ": " + e.getMessage());
             }
         }
-        
-        System.out.println("✅ Crawler finalizó su rango asignado.");
+
+        System.out.println("Crawler finished its assigned range.");
     }
 }

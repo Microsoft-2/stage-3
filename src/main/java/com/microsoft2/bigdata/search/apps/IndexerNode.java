@@ -14,7 +14,7 @@ import com.microsoft2.bigdata.search.infrastructure.persistence.HazelcastIndexRe
  
 public class IndexerNode {
     public static void main(String[] args) {
-        System.out.println("⚙️ INICIANDO INDEXER NODE...");
+        System.out.println("STARTING INDEXER NODE...");
 
         String brokerUrl = System.getenv().getOrDefault("BROKER_URL", "tcp://localhost:61616");
         String datalakePath = System.getenv().getOrDefault("DATALAKE_PATH", "datalake_store");
@@ -31,9 +31,9 @@ public class IndexerNode {
         IndexerService indexer = new IndexerService(datalake, indexRepo);
 
         // 3. Suscripción
-        System.out.println("⚙️ Indexer: Esperando eventos en 'document.downloaded'...");
+        System.out.println("Indexer: Waiting for events on 'document.downloaded'...");
         eventBus.subscribe("document.downloaded", docId -> {
-            System.out.println("⚙️ Evento recibido. Indexando: " + docId);
+            System.out.println("Event received. Indexing: " + docId);
             indexer.indexDocument(docId);
         });
         
