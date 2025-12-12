@@ -23,24 +23,17 @@ public class CrawlerService {
     public void ingestContent(String bookId) {
         // 1. Descargar texto usando el proveedor (Gutendex)
         String content = bookProvider.getBookText(bookId);
-        
         if (content == null) return;
 
-        // 2. Adaptamos a la entidad de dominio
         Document document = new Document(bookId, content);
 
         // 3. Guardar al datalake
         datalake.save(document);
 
-        String jsonEvent = new Gson().toJson(Map.of(
-            "id", document.getId(),
-            "content", document.getContent()
-        ));
-
-        System.out.println("Document " + bookId + " downloaded and saved.");
+        System.out.println("Document " + bookId + " saved on cluster.");
 
         // Nombre del topic: document.downloaded
-        eventBus.publish("document.downloaded", jsonEvent);
+        eventBus.publish("document.downloaded", bookId);
     }
 
 }
