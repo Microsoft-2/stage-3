@@ -1,5 +1,5 @@
 services:
-  # --- INFRASTRUCTURE ---
+  # --- INFRAESTRUCTURA ---
   activemq:
     image: apache/activemq-classic:latest
     ports:
@@ -15,101 +15,31 @@ services:
     volumes:
       - ./nginx_local.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - search-node-1
-      - search-node-2
-      - search-node-3
-      - search-node-4
-      - search-node-5
-      - search-node-6
+      - search-node
     networks:
       - search-net
 
-  # --- CRAWLERS (6 Nodes - Different Ranges) ---
-  crawler-1:
+  # --- APLICACIÓN ---
+  crawler:
     build: .
     command: com.microsoft2.bigdata.search.apps.CrawlerNode
-    restart: on-failure
     environment:
       - BROKER_URL=tcp://activemq:61616
       - BOOK_START=1000
-      - BOOK_END=1050
+      - BOOK_END=2000
+      - DATALAKE_PATH=/app/data
     volumes:
       - datalake_shared:/app/data
-    networks:
-      - search-net
-
-  crawler-2:
-    build: .
-    command: com.microsoft2.bigdata.search.apps.CrawlerNode
     restart: on-failure
-    environment:
-      - BROKER_URL=tcp://activemq:61616
-      - BOOK_START=1050
-      - BOOK_END=1100
-    volumes:
-      - datalake_shared:/app/data
     networks:
       - search-net
 
-  crawler-3:
-    build: .
-    command: com.microsoft2.bigdata.search.apps.CrawlerNode
-    restart: on-failure
-    environment:
-      - BROKER_URL=tcp://activemq:61616
-      - BOOK_START=1100
-      - BOOK_END=1150
-    volumes:
-      - datalake_shared:/app/data
-    networks:
-      - search-net
-
-  crawler-4:
-    build: .
-    command: com.microsoft2.bigdata.search.apps.CrawlerNode
-    restart: on-failure
-    environment:
-      - BROKER_URL=tcp://activemq:61616
-      - BOOK_START=1150
-      - BOOK_END=1200
-    volumes:
-      - datalake_shared:/app/data
-    networks:
-      - search-net
-
-  crawler-5:
-    build: .
-    command: com.microsoft2.bigdata.search.apps.CrawlerNode
-    restart: on-failure
-    environment:
-      - BROKER_URL=tcp://activemq:61616
-      - BOOK_START=1200
-      - BOOK_END=1250
-    volumes:
-      - datalake_shared:/app/data
-    networks:
-      - search-net
-
-  crawler-6:
-    build: .
-    command: com.microsoft2.bigdata.search.apps.CrawlerNode
-    restart: on-failure
-    environment:
-      - BROKER_URL=tcp://activemq:61616
-      - BOOK_START=1250
-      - BOOK_END=1300
-    volumes:
-      - datalake_shared:/app/data
-    networks:
-      - search-net
-
-  # --- INDEXERS (6 Nodes) ---
-  indexer-1:
+  indexer:
     build: .
     command: com.microsoft2.bigdata.search.apps.IndexerNode
-    restart: on-failure
     environment:
       - BROKER_URL=tcp://activemq:61616
+      - DATALAKE_PATH=/app/data
     volumes:
       - datalake_shared:/app/data
     depends_on:
@@ -117,113 +47,7 @@ services:
     networks:
       - search-net
 
-  indexer-2:
-    build: .
-    command: com.microsoft2.bigdata.search.apps.IndexerNode
-    restart: on-failure
-    environment:
-      - BROKER_URL=tcp://activemq:61616
-    volumes:
-      - datalake_shared:/app/data
-    depends_on:
-      - activemq
-    networks:
-      - search-net
-
-  indexer-3:
-    build: .
-    command: com.microsoft2.bigdata.search.apps.IndexerNode
-    restart: on-failure
-    environment:
-      - BROKER_URL=tcp://activemq:61616
-    volumes:
-      - datalake_shared:/app/data
-    depends_on:
-      - activemq
-    networks:
-      - search-net
-
-  indexer-4:
-    build: .
-    command: com.microsoft2.bigdata.search.apps.IndexerNode
-    restart: on-failure
-    environment:
-      - BROKER_URL=tcp://activemq:61616
-    volumes:
-      - datalake_shared:/app/data
-    depends_on:
-      - activemq
-    networks:
-      - search-net
-
-  indexer-5:
-    build: .
-    command: com.microsoft2.bigdata.search.apps.IndexerNode
-    restart: on-failure
-    environment:
-      - BROKER_URL=tcp://activemq:61616
-    volumes:
-      - datalake_shared:/app/data
-    depends_on:
-      - activemq
-    networks:
-      - search-net
-
-  indexer-6:
-    build: .
-    command: com.microsoft2.bigdata.search.apps.IndexerNode
-    restart: on-failure
-    environment:
-      - BROKER_URL=tcp://activemq:61616
-    volumes:
-      - datalake_shared:/app/data
-    depends_on:
-      - activemq
-    networks:
-      - search-net
-
-  # --- SEARCH NODES (6 Nodes) ---
-  search-node-1:
-    build: .
-    command: com.microsoft2.bigdata.search.apps.SearchNode
-    environment:
-      - PORT=8080
-    networks:
-      - search-net
-
-  search-node-2:
-    build: .
-    command: com.microsoft2.bigdata.search.apps.SearchNode
-    environment:
-      - PORT=8080
-    networks:
-      - search-net
-
-  search-node-3:
-    build: .
-    command: com.microsoft2.bigdata.search.apps.SearchNode
-    environment:
-      - PORT=8080
-    networks:
-      - search-net
-
-  search-node-4:
-    build: .
-    command: com.microsoft2.bigdata.search.apps.SearchNode
-    environment:
-      - PORT=8080
-    networks:
-      - search-net
-
-  search-node-5:
-    build: .
-    command: com.microsoft2.bigdata.search.apps.SearchNode
-    environment:
-      - PORT=8080
-    networks:
-      - search-net
-
-  search-node-6:
+  search-node:
     build: .
     command: com.microsoft2.bigdata.search.apps.SearchNode
     environment:
@@ -235,5 +59,6 @@ networks:
   search-net:
     driver: bridge
 
+# Definimos el volumen globalmente
 volumes:
   datalake_shared:
