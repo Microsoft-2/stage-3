@@ -4,8 +4,6 @@ import com.microsoft2.bigdata.search.domain.model.Document;
 import com.microsoft2.bigdata.search.domain.ports.DatalakeRepository;
 import com.microsoft2.bigdata.search.domain.ports.BookProvider;
 import com.microsoft2.bigdata.search.domain.ports.EventBus;
-import com.google.gson.Gson;
-import java.util.Map;
 
 public class CrawlerService {
     private final DatalakeRepository datalake;
@@ -23,14 +21,16 @@ public class CrawlerService {
     public void ingestContent(String bookId) {
         // 1. Descargar texto usando el proveedor (Gutendex)
         String content = bookProvider.getBookText(bookId);
+        
         if (content == null) return;
 
+        // 2. Adaptamos a la entidad de dominio
         Document document = new Document(bookId, content);
 
         // 3. Guardar al datalake
         datalake.save(document);
 
-        System.out.println("Document " + bookId + " saved on cluster.");
+        System.out.println("Document " + bookId + " downloaded and saved.");
 
         // Nombre del topic: document.downloaded
         eventBus.publish("document.downloaded", bookId);

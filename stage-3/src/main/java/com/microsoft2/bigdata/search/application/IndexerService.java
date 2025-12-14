@@ -16,22 +16,22 @@ public class IndexerService {
     }
 
     public void indexDocument(String documentId){
-        // 1. Recuperar el documento completo del Datalake (Hazelcast)
+        // 1. Recuperar el documento completo del Datalake
         Document doc = datalake.load(documentId);
 
         if (doc == null){
-            System.err.println("Indexer: Error, documento no encontrado: " + documentId);
+            System.err.println("Indexer: Error, document not find: " + documentId);
             return;
         }
 
-        // 2. Tokenizar
+        // 2. Tokenizar (usando la lógica de la entidad Document)
         Set<String> tokens = doc.tokenize();
 
-        // 3. Guardar en el índice invertido
+        // 3. Guardar cada palabra en el índice invertido
         for (String word : tokens){
             indexRepository.save(word, doc.getId());
         }
 
-        System.out.println("Indexer: Documento " + documentId + " indexado (" + tokens.size() + " palabras).");
+        System.out.println("Indexer: Document " + documentId + " indexed (" + tokens.size() + " words).");
     }
 }
