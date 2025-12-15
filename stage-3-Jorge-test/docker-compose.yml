@@ -1,0 +1,256 @@
+version: '3.8'
+
+services:
+  # --- INFRASTRUCTURE ---
+  activemq:
+    image: apache/activemq-classic:6.0.1
+    ports:
+      - "8161:8161"
+      - "61616:61616"
+    networks:
+      - search-net
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx_local.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - search1
+      - search2
+      - search3
+      - search4
+      - search5
+      - search6
+    networks:
+      - search-net
+
+  # --- CRAWLERS (6 Nodos) ---
+  crawler1:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.CrawlerNode
+    environment:
+      - BROKER_URL=tcp://activemq:61616
+      - BOOK_START=1000
+      - BOOK_END=2000
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_local:/app/data
+    restart: on-failure
+    networks:
+      - search-net
+
+  crawler2:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.CrawlerNode
+    environment:
+      - BROKER_URL=tcp://activemq:61616
+      - BOOK_START=2001
+      - BOOK_END=3000
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_local:/app/data
+    restart: on-failure
+    networks:
+      - search-net
+    
+  crawler3:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.CrawlerNode
+    environment:
+      - BROKER_URL=tcp://activemq:61616
+      - BOOK_START=3001
+      - BOOK_END=4000
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_local:/app/data
+    restart: on-failure
+    networks:
+      - search-net
+
+  crawler4:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.CrawlerNode
+    environment:
+      - BROKER_URL=tcp://activemq:61616
+      - BOOK_START=4001
+      - BOOK_END=5000
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_local:/app/data
+    restart: on-failure
+    networks:
+      - search-net
+
+  crawler5:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.CrawlerNode
+    environment:
+      - BROKER_URL=tcp://activemq:61616
+      - BOOK_START=5001
+      - BOOK_END=6000
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_local:/app/data
+    restart: on-failure
+    networks:
+      - search-net
+
+  crawler6:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.CrawlerNode
+    environment:
+      - BROKER_URL=tcp://activemq:61616
+      - BOOK_START=6001
+      - BOOK_END=7000
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_local:/app/data
+    restart: on-failure
+    networks:
+      - search-net
+
+  # --- INDEXERS (6 Nodos) ---
+  indexer1:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.IndexerNode
+    environment:
+      - BROKER_URL=tcp://activemq:61616
+      - DATALAKE_PATH=/app/data
+      - CLUSTER_MEMBERS=indexer1,indexer2,indexer3,indexer4,indexer5,indexer6,search1,search2,search3,search4,search5,search6
+    volumes:
+      - ./data_local:/app/data
+    depends_on:
+      - activemq
+    networks:
+      - search-net
+
+  indexer2:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.IndexerNode
+    environment:
+      - BROKER_URL=tcp://activemq:61616
+      - DATALAKE_PATH=/app/data
+      - CLUSTER_MEMBERS=indexer1,indexer2,indexer3,indexer4,indexer5,indexer6,search1,search2,search3,search4,search5,search6
+    volumes:
+      - ./data_local:/app/data
+    depends_on:
+      - activemq
+    networks:
+      - search-net
+
+  indexer3:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.IndexerNode
+    environment:
+      - BROKER_URL=tcp://activemq:61616
+      - DATALAKE_PATH=/app/data
+      - CLUSTER_MEMBERS=indexer1,indexer2,indexer3,indexer4,indexer5,indexer6,search1,search2,search3,search4,search5,search6
+    volumes:
+      - ./data_local:/app/data
+    depends_on:
+      - activemq
+    networks:
+      - search-net
+
+  indexer4:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.IndexerNode
+    environment:
+      - BROKER_URL=tcp://activemq:61616
+      - DATALAKE_PATH=/app/data
+      - CLUSTER_MEMBERS=indexer1,indexer2,indexer3,indexer4,indexer5,indexer6,search1,search2,search3,search4,search5,search6
+    volumes:
+      - ./data_local:/app/data
+    depends_on:
+      - activemq
+    networks:
+      - search-net
+
+  indexer5:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.IndexerNode
+    environment:
+      - BROKER_URL=tcp://activemq:61616
+      - DATALAKE_PATH=/app/data
+      - CLUSTER_MEMBERS=indexer1,indexer2,indexer3,indexer4,indexer5,indexer6,search1,search2,search3,search4,search5,search6
+    volumes:
+      - ./data_local:/app/data
+    depends_on:
+      - activemq
+    networks:
+      - search-net
+
+  indexer6:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.IndexerNode
+    environment:
+      - BROKER_URL=tcp://activemq:61616
+      - DATALAKE_PATH=/app/data
+      - CLUSTER_MEMBERS=indexer1,indexer2,indexer3,indexer4,indexer5,indexer6,search1,search2,search3,search4,search5,search6
+    volumes:
+      - ./data_local:/app/data
+    depends_on:
+      - activemq
+    networks:
+      - search-net
+
+  # --- SEARCH NODES (6 Nodos) ---
+  search1:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.SearchNode
+    environment:
+        - PORT=8080
+        - CLUSTER_MEMBERS=indexer1,indexer2,indexer3,indexer4,indexer5,indexer6,search1,search2,search3,search4,search5,search6
+    networks:
+        - search-net
+
+  search2:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.SearchNode
+    environment:
+      - PORT=8080
+      - CLUSTER_MEMBERS=indexer1,indexer2,indexer3,indexer4,indexer5,indexer6,search1,search2,search3,search4,search5,search6
+    networks:
+      - search-net
+
+  search3:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.SearchNode
+    environment:
+      - PORT=8080
+      - CLUSTER_MEMBERS=indexer1,indexer2,indexer3,indexer4,indexer5,indexer6,search1,search2,search3,search4,search5,search6
+    networks:
+      - search-net
+
+  search4:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.SearchNode
+    environment:
+      - PORT=8080
+      - CLUSTER_MEMBERS=indexer1,indexer2,indexer3,indexer4,indexer5,indexer6,search1,search2,search3,search4,search5,search6
+    networks:
+      - search-net
+
+  search5:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.SearchNode
+    environment:
+      - PORT=8080
+      - CLUSTER_MEMBERS=indexer1,indexer2,indexer3,indexer4,indexer5,indexer6,search1,search2,search3,search4,search5,search6
+    networks:
+      - search-net
+
+  search6:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.SearchNode
+    environment:
+      - PORT=8080
+      - CLUSTER_MEMBERS=indexer1,indexer2,indexer3,indexer4,indexer5,indexer6,search1,search2,search3,search4,search5,search6
+    networks:
+      - search-net
+
+networks:
+  search-net:
+    driver: bridge
