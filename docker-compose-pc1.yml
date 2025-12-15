@@ -1,0 +1,149 @@
+vversion: '3.8'
+
+services:
+  # --- INFRAESTRUCTURA (Solo en PC 1) ---
+  activemq:
+    image: apache/activemq-classic:6.0.1
+    ports:
+      - "8161:8161"
+      - "61616:61616"
+    networks:
+      - search-net
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx_split.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - search1
+      - search2
+      - search3
+    networks:
+      - search-net
+
+  # --- CRAWLERS (PC 1) ---
+  crawler1:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.CrawlerNode
+    environment:
+      - BROKER_URL=tcp://host.docker.internal:61616
+      - HAZELCAST_MEMBER_1=10.26.14.249  # <--- CAMBIA POR IP PC 1
+      - HAZELCAST_MEMBER_2=10.26.14.248  # <--- CAMBIA POR IP PC 2
+      - BOOK_START=1000
+      - BOOK_END=2000
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_pc1:/app/data
+    ports:
+      - "5701:5701"
+    networks:
+      - search-net
+
+  crawler2:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.CrawlerNode
+    environment:
+      - BROKER_URL=tcp://host.docker.internal:61616
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+      - BOOK_START=2001
+      - BOOK_END=3000
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_pc1:/app/data
+    networks:
+      - search-net
+
+  crawler3:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.CrawlerNode
+    environment:
+      - BROKER_URL=tcp://host.docker.internal:61616
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+      - BOOK_START=3001
+      - BOOK_END=4000
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_pc1:/app/data
+    networks:
+      - search-net
+
+  # --- INDEXERS (PC 1) ---
+  indexer1:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.IndexerNode
+    environment:
+      - BROKER_URL=tcp://host.docker.internal:61616
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_pc1:/app/data
+    depends_on:
+      - activemq
+    networks:
+      - search-net
+
+  indexer2:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.IndexerNode
+    environment:
+      - BROKER_URL=tcp://host.docker.internal:61616
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_pc1:/app/data
+    networks:
+      - search-net
+
+  indexer3:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.IndexerNode
+    environment:
+      - BROKER_URL=tcp://host.docker.internal:61616
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_pc1:/app/data
+    networks:
+      - search-net
+
+  # --- SEARCH NODES (PC 1) ---
+  search1:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.SearchNode
+    environment:
+      - PORT=8080
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+    networks:
+      - search-net
+
+  search2:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.SearchNode
+    environment:
+      - PORT=8080
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+    networks:
+      - search-net
+
+  search3:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.SearchNode
+    environment:
+      - PORT=8080
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+    networks:
+      - search-net
+
+networks:
+  search-net:
+    driver: bridge

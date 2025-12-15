@@ -1,0 +1,131 @@
+version: '3.8'
+
+services:
+  # --- CRAWLERS (PC 2) ---
+  crawler4:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.CrawlerNode
+    environment:
+      - BROKER_URL=tcp://10.26.14.249:61616  # <--- PON LA IP DEL PC 1
+      - HAZELCAST_MEMBER_1=10.26.14.249      # IP PC 1
+      - HAZELCAST_MEMBER_2=10.26.14.248      # IP PC 2
+      - BOOK_START=4001
+      - BOOK_END=5000
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_pc2:/app/data
+    ports:
+      - "5701:5701" # Puerto Hazelcast
+    networks:
+      - search-net
+
+  crawler5:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.CrawlerNode
+    environment:
+      - BROKER_URL=tcp://10.26.14.249:61616
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+      - BOOK_START=5001
+      - BOOK_END=6000
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_pc2:/app/data
+    networks:
+      - search-net
+
+  crawler6:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.CrawlerNode
+    environment:
+      - BROKER_URL=tcp://10.26.14.249:61616
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+      - BOOK_START=6001
+      - BOOK_END=7000
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_pc2:/app/data
+    networks:
+      - search-net
+
+  # --- INDEXERS (PC 2) ---
+  indexer4:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.IndexerNode
+    environment:
+      - BROKER_URL=tcp://10.26.14.249:61616
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_pc2:/app/data
+    networks:
+      - search-net
+
+  indexer5:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.IndexerNode
+    environment:
+      - BROKER_URL=tcp://10.26.14.249:61616
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_pc2:/app/data
+    networks:
+      - search-net
+
+  indexer6:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.IndexerNode
+    environment:
+      - BROKER_URL=tcp://10.26.14.249:61616
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_pc2:/app/data
+    networks:
+      - search-net
+
+  # --- SEARCH NODES (PC 2 - Puertos Expuestos) ---
+  search4:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.SearchNode
+    environment:
+      - PORT=8080
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+    ports:
+      - "8084:8080"
+    networks:
+      - search-net
+
+  search5:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.SearchNode
+    environment:
+      - PORT=8080
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+    ports:
+      - "8085:8080"
+    networks:
+      - search-net
+
+  search6:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.SearchNode
+    environment:
+      - PORT=8080
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+    ports:
+      - "8086:8080"
+    networks:
+      - search-net
+
+networks:
+  search-net:
+    driver: bridge
