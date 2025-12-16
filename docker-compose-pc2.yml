@@ -1,14 +1,13 @@
 version: '3.8'
 
 services:
-  # --- CRAWLERS (PC 2) ---
   crawler4:
     build: .
     command: com.microsoft2.bigdata.search.apps.CrawlerNode
     environment:
-      - BROKER_URL=tcp://10.26.14.249:61616  # <--- ¡IMPORTANTE! PON LA IP DEL PC 1 AQUÍ
-      - HAZELCAST_MEMBER_1=10.26.14.249      # IP PC 1
-      - HAZELCAST_MEMBER_2=10.26.14.248      # IP PC 2
+      - BROKER_URL=tcp://10.26.14.249:61616 
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
       - BOOK_START=4001
       - BOOK_END=5000
       - DATALAKE_PATH=/app/data
@@ -23,7 +22,7 @@ services:
     build: .
     command: com.microsoft2.bigdata.search.apps.CrawlerNode
     environment:
-      - BROKER_URL=tcp://10.26.14.249:61616  # <--- IP DEL PC 1
+      - BROKER_URL=tcp://10.26.14.249:61616
       - HAZELCAST_MEMBER_1=10.26.14.249
       - HAZELCAST_MEMBER_2=10.26.14.248
       - BOOK_START=5001
@@ -38,7 +37,7 @@ services:
     build: .
     command: com.microsoft2.bigdata.search.apps.CrawlerNode
     environment:
-      - BROKER_URL=tcp://10.26.14.249:61616  # <--- IP DEL PC 1
+      - BROKER_URL=tcp://10.26.14.249:61616
       - HAZELCAST_MEMBER_1=10.26.14.249
       - HAZELCAST_MEMBER_2=10.26.14.248
       - BOOK_START=6001
@@ -49,12 +48,11 @@ services:
     networks:
       - search-net
 
-  # --- INDEXERS (PC 2) ---
   indexer4:
     build: .
     command: com.microsoft2.bigdata.search.apps.IndexerNode
     environment:
-      - BROKER_URL=tcp://10.26.14.249:61616  # <--- IP DEL PC 1
+      - BROKER_URL=tcp://10.26.14.249:61616
       - HAZELCAST_MEMBER_1=10.26.14.249
       - HAZELCAST_MEMBER_2=10.26.14.248
       - DATALAKE_PATH=/app/data
@@ -67,7 +65,7 @@ services:
     build: .
     command: com.microsoft2.bigdata.search.apps.IndexerNode
     environment:
-      - BROKER_URL=tcp://10.26.14.249:61616  # <--- IP DEL PC 1
+      - BROKER_URL=tcp://10.26.14.249:61616
       - HAZELCAST_MEMBER_1=10.26.14.249
       - HAZELCAST_MEMBER_2=10.26.14.248
       - DATALAKE_PATH=/app/data
@@ -80,7 +78,7 @@ services:
     build: .
     command: com.microsoft2.bigdata.search.apps.IndexerNode
     environment:
-      - BROKER_URL=tcp://10.26.14.249:61616  # <--- IP DEL PC 1
+      - BROKER_URL=tcp://10.26.14.249:61616
       - HAZELCAST_MEMBER_1=10.26.14.249
       - HAZELCAST_MEMBER_2=10.26.14.248
       - DATALAKE_PATH=/app/data
@@ -89,7 +87,6 @@ services:
     networks:
       - search-net
 
-  # --- SEARCH NODES (PC 2) ---
   search4:
     build: .
     command: com.microsoft2.bigdata.search.apps.SearchNode
