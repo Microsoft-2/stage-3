@@ -22,10 +22,8 @@ public class Document implements Serializable {
         return content;
     }
 
-    //Dividimos el documento en PALABRAS (tokens)
     public Set<String> tokenize() {
         if (content == null || content.isEmpty()) return new HashSet<>();
-        // Divide por espacios y convierte a minúsculas
         String[] tokens = content.toLowerCase().split("\\W+");
         return new HashSet<>(Arrays.asList(tokens));
     }
