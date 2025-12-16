@@ -38,5 +38,4 @@ public class CrawlerNode {
 
         System.out.println("Crawler finished its assigned range.");
     }
-
 }
