@@ -15,30 +15,23 @@ public class SearchNode {
     public static void main(String[] args) {
         System.out.println("STARTING SEARCH NODE (API REST)...");
 
-        // Configuración de Puerto (Docker nos pasará el puerto por variable de entorno)
-        // Si no, usa el 8080 por defecto
         port(Integer.parseInt(System.getenv().getOrDefault("PORT", "8080")));
 
-        // 1. Infraestructura
         Config config = HazelcastConfigFactory.createConfig();
         HazelcastInstance hz = Hazelcast.newHazelcastInstance(config);
         IndexRepository indexRepo = new HazelcastIndexRepository(hz);
 
-        // 2. Aplicación
         SearchService searchService = new SearchService(indexRepo);
 
-        // 3. API REST (SparkJava)
-        
-        // Endpoint: GET /search?q=palabra
         get("/search", (req, res) -> {
             String query = req.queryParams("q");
             if (query == null) {
                 res.status(400);
-                return "Falta el parámetro 'q'";
+                return "Parameter 'q' missing";
             }
 
             System.out.println("Search query received: " + query);
-            return searchService.search(query); // Devuelve JSON automáticamente (Set.toString())
+            return searchService.search(query);
         });
 
         System.out.println("Server Web ready on port " + port());

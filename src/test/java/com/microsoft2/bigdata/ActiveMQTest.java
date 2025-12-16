@@ -32,7 +32,7 @@ public class ActiveMQTest {
         SearchService searchEngine = new SearchService(indexRepo);
 
         eventBus.subscribe("document.downloaded", docId -> {
-            System.out.println("Evento recieved Starting asynchronous indexing");
+            System.out.println("Event recieved Starting asynchronous indexing");
             indexer.indexDocument(docId);
         });
 
