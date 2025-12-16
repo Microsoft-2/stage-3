@@ -10,11 +10,9 @@ public class ActiveMQEventBus implements EventBus {
 
     public ActiveMQEventBus(String brokerUrl) {
         try {
-            // Conectamos con el servidor de ActiveMQ
             ConnectionFactory factory = new ActiveMQConnectionFactory(brokerUrl);
             this.connection = factory.createConnection();
             this.connection.start();
-            // false = sin transacciones, AUTO_ACKNOWLEDGE = confirmación automática
             this.session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         } catch (JMSException e) {
             throw new RuntimeException("Error conecting to ActiveMQ", e);
@@ -40,7 +38,6 @@ public class ActiveMQEventBus implements EventBus {
             Destination destination = session.createTopic(topicName);
             MessageConsumer jmsConsumer = session.createConsumer(destination);
             
-            // Listener asíncrono: Se ejecuta en un hilo separado cuando llega un mensaje
             jmsConsumer.setMessageListener(message -> {
                 try {
                     if (message instanceof TextMessage textMessage) {
