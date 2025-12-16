@@ -1,3 +1,5 @@
+// Contenido actualizado para IndexerService.java
+
 package com.microsoft2.bigdata.search.application;
 
 import com.microsoft2.bigdata.search.domain.model.Document;
@@ -16,6 +18,8 @@ public class IndexerService {
     }
 
     public void indexDocument(String documentId){
+        long startTime = System.currentTimeMillis(); // <-- INICIO DE MEDICIÓN
+
         // 1. Recuperar el documento completo del Datalake
         Document doc = datalake.load(documentId);
 
@@ -26,12 +30,22 @@ public class IndexerService {
 
         // 2. Tokenizar (usando la lógica de la entidad Document)
         Set<String> tokens = doc.tokenize();
+        int tokenCount = tokens.size(); // Contar tokens para la métrica
 
         // 3. Guardar cada palabra en el índice invertido
         for (String word : tokens){
             indexRepository.save(word, doc.getId());
         }
 
-        System.out.println("Indexer: Document " + documentId + " indexed (" + tokens.size() + " words).");
+        long endTime = System.currentTimeMillis(); // <-- FIN DE MEDICIÓN
+        double durationSec = (endTime - startTime) / 1000.0;
+        
+        // CÁLCULO Y REPORTE
+        // tokens/s = Total de tokens / tiempo_en_segundos
+        double indexingThroughput = tokenCount / durationSec; 
+        
+        // Logueamos los resultados en la terminal del contenedor
+        System.out.printf("INDEXER: Document %s indexed. Tokens: %d. Time: %.3f s. Indexing Throughput: %.2f tokens/s%n",
+                            documentId, tokenCount, durationSec, indexingThroughput);
     }
 }
