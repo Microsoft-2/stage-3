@@ -14,7 +14,7 @@ public class FileSystemDatalake implements DatalakeRepository {
 
     public FileSystemDatalake(String storagePath) {
         this.storagePath = storagePath;
-        new File(storagePath).mkdirs(); // Crear carpeta si no existe
+        new File(storagePath).mkdirs();
     }
 
     @Override
