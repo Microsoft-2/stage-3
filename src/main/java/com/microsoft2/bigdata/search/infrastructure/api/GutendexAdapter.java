@@ -15,7 +15,6 @@ public class GutendexAdapter implements BookProvider {
     private final HttpClient client;
 
     public GutendexAdapter() {
-        // Usamos una configuración básica, la redirección la manejaremos manualmente para más control
         this.client = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(10))
                 .build();
@@ -51,7 +50,7 @@ public class GutendexAdapter implements BookProvider {
                 return null;
             }
 
-            System.out.println("⬇Downloading book content...");
+            System.out.println("Downloading book content...");
             return fetch(textUrl);
 
         } catch (Exception e) {
@@ -63,13 +62,13 @@ public class GutendexAdapter implements BookProvider {
 
     private String fetch(String url) throws Exception {
         int maxRetries = 5;
-        int waitTime = 10000; // Empezamos esperando 10 segundos si falla
+        int waitTime = 10000;
 
         for (int i = 0; i < maxRetries; i++) {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .GET()
-                    .header("User-Agent", "Mozilla/5.0 (Education Project; ULPGC)") // Sé amable identificándote
+                    .header("User-Agent", "Mozilla/5.0 (Education Project; ULPGC)")
                     .build();
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
@@ -79,14 +78,12 @@ public class GutendexAdapter implements BookProvider {
                 return response.body();
             } 
             else if (status == 429) {
-                // ERROR 429: BLOQUEO TEMPORAL POR EXCESO DE PETICIONES
                 System.err.println("Rate Limit (429) detected. Waiting " + (waitTime/1000) + "s before retrying...");
                 Thread.sleep(waitTime);
-                waitTime *= 2; // Exponential Backoff: Esperamos el doble la próxima vez (10s, 20s, 40s...)
-                continue; // Volvemos a intentar la misma petición
+                waitTime *= 2;
+                continue;
             }
             else if (status >= 300 && status < 400) {
-                // Manejo de Redirecciones (Como ya tenías)
                 String newUrl = response.headers().firstValue("Location").orElse(null);
                 if (newUrl == null) throw new RuntimeException("Redirection without Location header");
                 if (!newUrl.startsWith("http")) newUrl = URI.create(url).resolve(newUrl).toString();
