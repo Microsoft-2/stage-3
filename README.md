@@ -11,6 +11,8 @@ In this stage, we extend the system built in previous phases and move from a mos
 * Jorge Cubero Toribio
 * Enrique Padrón Hernández
 
+https://youtu.be/Fb7o1Wcc5k0
+
 ---
 
 ## Objectives
@@ -121,3 +123,4 @@ docker logs -f stage-3-crawler-1
 ```
 
 ---
+
