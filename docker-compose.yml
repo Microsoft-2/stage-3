@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # --- INFRASTRUCTURE ---
   activemq:
     image: apache/activemq-classic:6.0.1
     ports:
@@ -26,7 +25,6 @@ services:
     networks:
       - search-net
 
-  # --- CRAWLERS (6 Nodos) ---
   crawler1:
     build: .
     command: com.microsoft2.bigdata.search.apps.CrawlerNode
@@ -111,7 +109,6 @@ services:
     networks:
       - search-net
 
-  # --- INDEXERS (6 Nodos) ---
   indexer1:
     build: .
     command: com.microsoft2.bigdata.search.apps.IndexerNode
@@ -196,7 +193,6 @@ services:
     networks:
       - search-net
 
-  # --- SEARCH NODES (6 Nodos) ---
   search1:
     build: .
     command: com.microsoft2.bigdata.search.apps.SearchNode
