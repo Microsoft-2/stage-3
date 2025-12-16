@@ -1,0 +1,154 @@
+version: '3.8'
+
+services:
+  activemq:
+    image: apache/activemq-classic:6.0.1
+    ports:
+      - "8161:8161"
+      - "61616:61616"
+    networks:
+      - search-net
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx_split.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - search1
+      - search2
+      - search3
+    networks:
+      - search-net
+
+  crawler1:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.CrawlerNode
+    restart: on-failure
+    environment:
+      - BROKER_URL=tcp://activemq:61616
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+      - BOOK_START=1000
+      - BOOK_END=2000
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_pc1:/app/data
+    ports:
+      - "5701:5701"
+    networks:
+      - search-net
+
+  crawler2:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.CrawlerNode
+    restart: on-failure
+    environment:
+      - BROKER_URL=tcp://activemq:61616
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+      - BOOK_START=2001
+      - BOOK_END=3000
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_pc1:/app/data
+    networks:
+      - search-net
+
+  crawler3:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.CrawlerNode
+    restart: on-failure
+    environment:
+      - BROKER_URL=tcp://activemq:61616
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+      - BOOK_START=3001
+      - BOOK_END=4000
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_pc1:/app/data
+    networks:
+      - search-net
+
+  indexer1:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.IndexerNode
+    restart: on-failure
+    environment:
+      - BROKER_URL=tcp://activemq:61616
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_pc1:/app/data
+    depends_on:
+      - activemq
+    networks:
+      - search-net
+
+  indexer2:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.IndexerNode
+    restart: on-failure
+    environment:
+      - BROKER_URL=tcp://activemq:61616
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_pc1:/app/data
+    networks:
+      - search-net
+
+  indexer3:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.IndexerNode
+    restart: on-failure
+    environment:
+      - BROKER_URL=tcp://activemq:61616
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+      - DATALAKE_PATH=/app/data
+    volumes:
+      - ./data_pc1:/app/data
+    networks:
+      - search-net
+
+  search1:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.SearchNode
+    restart: on-failure
+    environment:
+      - PORT=8080
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+    networks:
+      - search-net
+
+  search2:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.SearchNode
+    restart: on-failure
+    environment:
+      - PORT=8080
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+    networks:
+      - search-net
+
+  search3:
+    build: .
+    command: com.microsoft2.bigdata.search.apps.SearchNode
+    restart: on-failure
+    environment:
+      - PORT=8080
+      - HAZELCAST_MEMBER_1=10.26.14.249
+      - HAZELCAST_MEMBER_2=10.26.14.248
+    networks:
+      - search-net
+
+networks:
+  search-net:
+    driver: bridge
