@@ -15,7 +15,6 @@ public class CrawlerNode {
         String brokerUrl = System.getenv().getOrDefault("BROKER_URL", "tcp://localhost:61616");
         String datalakePath = System.getenv().getOrDefault("DATALAKE_PATH", "datalake_store");
         
-        // Configuración del rango de libros (Por defecto descarga del ID 1 al 10)
         int startId = Integer.parseInt(System.getenv().getOrDefault("BOOK_START", "1"));
         int endId = Integer.parseInt(System.getenv().getOrDefault("BOOK_END", "10"));
 
@@ -39,4 +38,5 @@ public class CrawlerNode {
 
         System.out.println("Crawler finished its assigned range.");
     }
+
 }
