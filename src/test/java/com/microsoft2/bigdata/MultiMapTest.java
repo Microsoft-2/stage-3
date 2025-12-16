@@ -9,32 +9,27 @@ import java.util.Set;
 
 public class MultiMapTest {
     public static void main(String[] args) {
-        System.out.println("--- Iniciando Nodo (Simulación) ---");
+        System.out.println("--- Starting Node ---");
 
-        // 1. Iniciamos Hazelcast (Infrastructure)
         HazelcastInstance hz = Hazelcast.newHazelcastInstance();
 
-        // 2. Creamos nuestro Adaptador (Infrastructure -> Domain)
         IndexRepository repo = new HazelcastIndexRepository(hz);
 
-        // 3. Simulamos la acción de un INDEXER (Guardar datos)
-        System.out.println("Indexando documentos...");
-        repo.save("programacion", "doc_1");
-        repo.save("programacion", "doc_2"); // La misma palabra en otro documento
+        System.out.println("Indexingd documents");
+        repo.save("programming", "doc_1");
+        repo.save("programming", "doc_2");
         repo.save("java", "doc_2");
         repo.save("bigdata", "doc_3");
 
-        // 4. Simulamos la acción de un SEARCH ENGINE (Leer datos)
-        System.out.println("Buscando 'programacion'...");
-        Set<String> resultados = repo.search("programacion");
+        System.out.println("Searching 'programming'");
+        Set<String> resultados = repo.search("programming");
 
-        // 5. Verificamos
-        System.out.println("Resultados encontrados: " + resultados);
+        System.out.println("Results found: " + results);
         
-        if (resultados.contains("doc_1") && resultados.contains("doc_2")) {
-            System.out.println("✅ ¡ÉXITO! El MultiMap funciona correctamente.");
+        if (results.contains("doc_1") && results.contains("doc_2")) {
+            System.out.println("MultiMap is working.");
         } else {
-            System.out.println("❌ ERROR: No se recuperaron los datos esperados.");
+            System.out.println("ERROR: Counld not find the data.");
         }
 
         hz.shutdown();
